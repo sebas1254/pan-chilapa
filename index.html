@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Panes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Notificación flotante -->
+    <div id="toast" class="toast">¡Pan agregado al carrito! 🥖</div>
+    <header>
+    <div class="title-container">
+        <h1 style="margin: 0; font-size: 1.5rem;">Pan de Chilapa</h1>
+        <h2 style="margin: 5px 0 2px 0; font-size: 1.1rem; color: var(--amarillo);">Abarrotes Yireh</h2>
+        <small style="font-size: 0.8rem; font-weight: normal;">Av. Cuauhtémoc a lado de la clínica del Dr. Pacheco</small>
+    </div>
+    <div class="cart-icon" id="cart-icon">
+        🛒 Carrito (<span id="cart-count">0</span>)
+    </div>
+</header>
+
+    <main>
+        <!-- Contenedor dinámico de productos -->
+        <div id="product-grid" class="grid"></div>
+    </main>
+
+    <!-- Modal / Panel del Carrito -->
+  <div id="cart-modal" class="hidden">
+        <div class="cart-content">
+            <h2>Tu Pedido</h2>
+            <div id="cart-items"></div>
+            
+            <!-- NUEVO: Selector de fecha -->
+            <div class="date-container">
+                <label for="fecha-entrega">¿Para cuándo lo necesitas?</label>
+                <input type="date" id="fecha-entrega">
+            </div>
+
+            <div class="cart-total">Total: $<span id="total-price">0</span></div>
+            
+            <!-- NUEVO: Mensaje de anticipo -->
+            <div class="anticipo-msg">
+                ⚠️ Para asegurar tu pedido requerimos un 30% de anticipo: <strong>$<span id="anticipo-price">0</span> MXN</strong>
+            </div>
+
+            <button id="btn-whatsapp" class="btn-ws">Pedir por WhatsApp</button>
+            <button id="btn-close-cart" style="background: var(--negro); color: var(--blanco); border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 5px;">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
