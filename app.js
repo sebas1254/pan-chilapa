@@ -1,13 +1,56 @@
-// Catálogo de productos
+// 1. Catálogo de productos con soporte para múltiples tamaños
 const productos = [
-    { id: 1, nombre: "Concha de Vainilla", img: "img/concha.webp", tamaño: "Grande", precio: 55 },
-    { id: 2, nombre: "Regañadas", img: "img/reganadas.webp", tamaño: "Grande", precio: 55 },
-    { id: 3, nombre: "Camarón", img: "img/camaron.webp", tamaño: "Grande", precio: 55 },
-    { id: 4, nombre: "Chilapeña", img: "img/chilapena.webp", tamaño: "Grande", precio: 55 },
-    { id: 5, nombre: "Semita de Requesón con Piloncillo", img: "img/semita.webp", tamaño: "Grande", precio: 55 },
-    { id: 6, nombre: "Amargoza con Ajonjoli", img: "img/amargozaajonjoli.webp", tamaño: "Grande", precio: 55 },
-    { id: 7, nombre: "Amargoza con azúcar", img: "img/amargozaazucar.webp", tamaño: "Grande", precio: 55 },
-    { id: 8, nombre: "Muñeco", img: "img/muneco.webp", tamaño: "Chico", precio: 7 }
+    { 
+        id: 1, nombre: "Concha de Vainilla", img: "img/concha.webp", 
+        variantes: [{ tamaño: "Grande", precio: 55 }] 
+    },
+    { 
+        id: 2, nombre: "Regañadas", img: "img/reganadas.webp", 
+        variantes: [{ tamaño: "Grande", precio: 55 }] 
+    },
+    { 
+        id: 3, nombre: "Camarón", img: "img/camaron.webp", 
+        variantes: [{ tamaño: "Grande", precio: 55 }] 
+    },
+    { 
+        id: 4, nombre: "Chilapeña", img: "img/chilapena.webp", 
+        variantes: [{ tamaño: "Grande", precio: 55 }] 
+    },
+    { 
+        id: 5, nombre: "Semita de Requesón con Piloncillo", img: "img/semita.webp", 
+        variantes: [
+            { tamaño: "Grande", precio: 50 }, 
+            { tamaño: "Extra grande", precio: 70 }
+        ] 
+    },
+    { 
+        id: 6, nombre: "Amargoza con Ajonjolí", img: "img/amargozaajonjoli.webp", 
+        variantes: [{ tamaño: "Grande", precio: 55 }] 
+    },
+    { 
+        id: 7, nombre: "Amargoza con azúcar", img: "img/amargozaazucar.webp", 
+        variantes: [{ tamaño: "Grande", precio: 55 }] 
+    },
+    { 
+        id: 8, nombre: "Torta", img: "img/blanco.webp", 
+        variantes: [
+            { tamaño: "Chico", precio: 9 }, 
+            { tamaño: "Mediano", precio: 18 }, 
+            { tamaño: "Grande", precio: 25 }, 
+            { tamaño: "Extra grande", precio: 35 }
+        ] 
+    },
+    { 
+        id: 9, nombre: "Muñeco", img: "img/muneco.webp", 
+        variantes: [
+            { tamaño: "Chico", precio: 8 }, 
+            { tamaño: "Grande", precio: 12 }
+        ] 
+    },
+    { 
+        id: 10, nombre: "Panela de Chilapa (2pz)", img: "img/panela.webp", 
+        variantes: [{ tamaño: "Grande", precio: 65 }] 
+    }
 ];
 
 let carrito = [];
@@ -27,12 +70,34 @@ if (fechaEntregaInput) fechaEntregaInput.setAttribute('min', hoy);
 function renderizarProductos() {
     grid.innerHTML = '';
     productos.forEach(prod => {
+        
+        let opcionesHTML = '';
+        prod.variantes.forEach((variante, index) => {
+            opcionesHTML += `<option value="${index}">${variante.tamaño} - $${variante.precio} MXN</option>`;
+        });
+
+        // Lógica visual: Si solo hay 1 opción, mostramos texto. Si hay varias, mostramos el menú select.
+        let mostrarSelect = prod.variantes.length > 1 ? 'block' : 'none';
+        let mostrarTextoFijo = prod.variantes.length === 1 ? 'block' : 'none';
+
         grid.innerHTML += `
             <div class="product-card">
                 <img src="${prod.img}" alt="${prod.nombre}">
                 <h3>${prod.nombre}</h3>
-                <p style="margin: 5px 0; font-size: 0.9rem; color: var(--negro);">Tamaño: ${prod.tamaño}</p>
-                <p style="margin: 5px 0; font-size: 1.1rem; color: var(--morado);"><strong>$${prod.precio} MXN</strong></p>
+                
+                <!-- Modo: Tamaño Único -->
+                <div style="display: ${mostrarTextoFijo};">
+                    <p style="margin: 5px 0; font-size: 0.9rem; color: var(--negro);">Tamaño: ${prod.variantes[0]?.tamaño}</p>
+                    <p style="margin: 5px 0; font-size: 1.1rem; color: var(--morado);"><strong>$${prod.variantes[0]?.precio} MXN</strong></p>
+                </div>
+
+                <!-- Modo: Varios Tamaños -->
+                <div class="variant-container" style="display: ${mostrarSelect}; margin: 10px 0;">
+                    <label for="var-${prod.id}" style="font-size: 0.9rem; font-weight: bold; color: var(--negro);">Elegir tamaño:</label>
+                    <select id="var-${prod.id}" style="width: 100%; padding: 8px; border-radius: 8px; border: 2px solid var(--morado); font-size: 16px; font-weight: bold; color: var(--morado); margin-top: 5px; outline: none; background: white;">
+                        ${opcionesHTML}
+                    </select>
+                </div>
                 
                 <div class="quantity-container">
                     <label for="qty-${prod.id}">Cantidad:</label>
@@ -47,48 +112,57 @@ function renderizarProductos() {
 function agregarAlCarrito(id) {
     const inputCantidad = document.getElementById(`qty-${id}`);
     const cantidadSeleccionada = parseInt(inputCantidad.value);
+    
+    // Identificar qué variante escogió el usuario
+    const selectVariante = document.getElementById(`var-${id}`);
+    const indexVariante = selectVariante ? selectVariante.value : 0;
 
     if (isNaN(cantidadSeleccionada) || cantidadSeleccionada <= 0) {
         alert("Por favor ingresa una cantidad válida.");
         return;
     }
 
-    const producto = productos.find(p => p.id === id);
-    const itemEnCarrito = carrito.find(item => item.id === id);
+    const productoBase = productos.find(p => p.id === id);
+    const varianteSeleccionada = productoBase.variantes[indexVariante];
+    
+    // Creamos un ID único combinando el ID del pan y el tamaño (Ej: "5-Extra grande")
+    const idUnicoEnCarrito = `${id}-${varianteSeleccionada.tamaño}`;
+    const itemEnCarrito = carrito.find(item => item.idUnico === idUnicoEnCarrito);
 
     if (itemEnCarrito) {
         itemEnCarrito.cantidad += cantidadSeleccionada;
     } else {
-        carrito.push({
-            id: producto.id,
-            nombre: producto.nombre,
-            tamaño: producto.tamaño,
-            precio: producto.precio,
-            cantidad: cantidadSeleccionada
+        carrito.push({ 
+            idUnico: idUnicoEnCarrito,
+            idBase: id,
+            nombre: productoBase.nombre,
+            tamaño: varianteSeleccionada.tamaño,
+            precio: varianteSeleccionada.precio,
+            cantidad: cantidadSeleccionada 
         });
     }
-
-    inputCantidad.value = 1;
+    
+    inputCantidad.value = 1; 
     actualizarCarrito();
-    mostrarNotificacion(cantidadSeleccionada, producto.nombre);
+    mostrarNotificacion(cantidadSeleccionada, `${productoBase.nombre} (${varianteSeleccionada.tamaño})`);
 }
 
-function cambiarCantidad(id, nuevaCantidad) {
+function cambiarCantidad(idUnico, nuevaCantidad) {
     const cantidad = parseInt(nuevaCantidad);
-    const item = carrito.find(i => i.id === id);
-
+    const item = carrito.find(i => i.idUnico === idUnico);
+    
     if (item) {
         if (cantidad > 0) {
             item.cantidad = cantidad;
         } else {
-            eliminarDelCarrito(id);
+            eliminarDelCarrito(idUnico);
         }
         actualizarCarrito();
     }
 }
 
-function eliminarDelCarrito(id) {
-    carrito = carrito.filter(item => item.id !== id);
+function eliminarDelCarrito(idUnico) {
+    carrito = carrito.filter(item => item.idUnico !== idUnico);
     actualizarCarrito();
 }
 
@@ -107,16 +181,15 @@ function actualizarCarrito() {
                 </div>
                 <div class="cart-item-actions">
                     <label>Cant:</label>
-                    <input type="number" value="${item.cantidad}" min="1" onchange="cambiarCantidad(${item.id}, this.value)">
-                    <button class="btn-delete" onclick="eliminarDelCarrito(${item.id})">❌</button>
+                    <input type="number" value="${item.cantidad}" min="1" onchange="cambiarCantidad('${item.idUnico}', this.value)">
+                    <button class="btn-delete" onclick="eliminarDelCarrito('${item.idUnico}')">❌</button>
                 </div>
             </div>
         `;
     });
-
-    // Actualizamos el total general y el cálculo del 30%
+    
     totalPriceEl.innerText = total;
-    anticipoPriceEl.innerText = Math.round(total * 0.30); // Redondeado para evitar centavos complicados
+    anticipoPriceEl.innerText = Math.round(total * 0.30); 
 }
 
 document.getElementById('btn-whatsapp').addEventListener('click', () => {
@@ -130,12 +203,11 @@ document.getElementById('btn-whatsapp').addEventListener('click', () => {
         return;
     }
 
-    const numeroWhatsApp = "527471729916";
+    const numeroWhatsApp = "527471729916"; 
     let total = 0;
-
-    // Formatear la fecha para que se lea mejor en WhatsApp
+    
     const fechaElegida = fechaEntregaInput.value.split('-').reverse().join('/');
-
+    
     let texto = `¡Hola! Quiero realizar el siguiente pedido para el día *${fechaElegida}*:\n\n`;
 
     carrito.forEach(item => {
@@ -144,7 +216,7 @@ document.getElementById('btn-whatsapp').addEventListener('click', () => {
     });
 
     const anticipo = Math.round(total * 0.30);
-
+    
     texto += `\n*Total del pedido: $${total} MXN*`;
     texto += `\n*Anticipo requerido (30%): $${anticipo} MXN*\n\n`;
     texto += `(Quedo atento para coordinar el pago del anticipo y asegurar mi apartado).`;
@@ -153,7 +225,7 @@ document.getElementById('btn-whatsapp').addEventListener('click', () => {
     window.open(url, '_blank');
 
     carrito = [];
-    fechaEntregaInput.value = ""; // Limpiamos la fecha
+    fechaEntregaInput.value = ""; 
     actualizarCarrito();
     cartModal.classList.add('hidden');
 });
