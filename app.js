@@ -73,37 +73,37 @@ function renderizarProductos() {
         
         let opcionesHTML = '';
         prod.variantes.forEach((variante, index) => {
-            opcionesHTML += `<option value="${index}">${variante.tamaño} - $${variante.precio} MXN</option>`;
+            // Se quitó "MXN" para que quepa bien en pantallas pequeñas
+            opcionesHTML += `<option value="${index}">${variante.tamaño} - $${variante.precio}</option>`;
         });
 
-        // Lógica visual: Si solo hay 1 opción, mostramos texto. Si hay varias, mostramos el menú select.
         let mostrarSelect = prod.variantes.length > 1 ? 'block' : 'none';
         let mostrarTextoFijo = prod.variantes.length === 1 ? 'block' : 'none';
 
         grid.innerHTML += `
-            <div class="product-card">
-                <img src="${prod.img}" alt="${prod.nombre}">
-                <h3>${prod.nombre}</h3>
+            <div class="product-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <img src="${prod.img}" alt="${prod.nombre}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px;">
+                <h3 style="font-size: 1.1rem; margin: 10px 0 5px 0;">${prod.nombre}</h3>
                 
                 <!-- Modo: Tamaño Único -->
-                <div style="display: ${mostrarTextoFijo};">
+                <div style="display: ${mostrarTextoFijo}; margin-bottom: 10px;">
                     <p style="margin: 5px 0; font-size: 0.9rem; color: var(--negro);">Tamaño: ${prod.variantes[0]?.tamaño}</p>
                     <p style="margin: 5px 0; font-size: 1.1rem; color: var(--morado);"><strong>$${prod.variantes[0]?.precio} MXN</strong></p>
                 </div>
 
                 <!-- Modo: Varios Tamaños -->
-                <div class="variant-container" style="display: ${mostrarSelect}; margin: 10px 0;">
-                    <label for="var-${prod.id}" style="font-size: 0.9rem; font-weight: bold; color: var(--negro);">Elegir tamaño:</label>
-                    <select id="var-${prod.id}" style="width: 100%; padding: 8px; border-radius: 8px; border: 2px solid var(--morado); font-size: 16px; font-weight: bold; color: var(--morado); margin-top: 5px; outline: none; background: white;">
+                <div class="variant-container" style="display: ${mostrarSelect}; margin: 10px 0; width: 100%;">
+                    <label for="var-${prod.id}" style="font-size: 0.85rem; font-weight: bold; color: var(--negro); display: block; text-align: left; margin-bottom: 5px;">Tamaño:</label>
+                    <select id="var-${prod.id}" style="width: 100%; max-width: 100%; box-sizing: border-box; padding: 10px 5px; border-radius: 8px; border: 2px solid var(--morado); font-size: 0.95rem; font-weight: bold; color: var(--morado); outline: none; background: white; text-overflow: ellipsis;">
                         ${opcionesHTML}
                     </select>
                 </div>
                 
-                <div class="quantity-container">
-                    <label for="qty-${prod.id}">Cantidad:</label>
-                    <input type="number" id="qty-${prod.id}" value="1" min="1" max="99">
+                <div class="quantity-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label for="qty-${prod.id}" style="font-size: 0.9rem; font-weight: bold; color: var(--negro);">Cant:</label>
+                    <input type="number" id="qty-${prod.id}" value="1" min="1" max="99" style="width: 60px; padding: 8px; border: 2px solid var(--morado); border-radius: 8px; text-align: center; font-size: 16px; font-weight: bold; color: var(--morado); outline: none; box-sizing: border-box;">
                 </div>
-                <button class="btn-add" onclick="agregarAlCarrito(${prod.id})">Agregar al Carrito</button>
+                <button class="btn-add" onclick="agregarAlCarrito(${prod.id})" style="margin-top: auto; padding: 12px; background: var(--morado); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%;">Agregar</button>
             </div>
         `;
     });
